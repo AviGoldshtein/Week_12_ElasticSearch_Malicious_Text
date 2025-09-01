@@ -39,7 +39,8 @@ class ElasticConnector:
     def delete_by_query(self,index, query):
         response = self.es.delete_by_query(
             index=index,
-            body=query
+            body=query,
+            conflicts="proceed"
         )
         print(response)
     def refresh_index(self, index_name):

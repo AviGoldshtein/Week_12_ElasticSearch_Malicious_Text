@@ -17,17 +17,16 @@ class ElasticConnector:
 
     def get_problematic_docs(self, index_name):
         black_list = self.data_loader.get_black_list()
-        query_string = " ".join(black_list)
+        print(black_list)
 
         query = {
             "query": {
-                "multi_match": {
-                    "query": query_string,
-                    "fields": ["text"]
+                "terms": {
+                    "text": black_list
                 }
             }
         }
-        return self.es.search(index=index_name, body=query)['hits']['hits']
+        return self.es.search(index=index_name, body=query, size=10000)['hits']['hits']
 
     def create_index(self, index_name, mappings):
         if not self.es.indices.exists(index=index_name):
@@ -42,3 +41,13 @@ class ElasticConnector:
             id=id,
             body=body
         )
+
+    def delete_by_query(self,index, query):
+        response = self.es.delete_by_query(
+            index=index,
+            body=query
+        )
+        print(response)
+
+    def refresh_index(self, index_name):
+        self.es.indices.refresh(index=index_name)

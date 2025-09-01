@@ -81,6 +81,7 @@ class Analyzer:
     def find_detected_weapons(self):
         self.logger.debug("find_detected_weapons")
         problematic_docs = self.es_connector.get_problematic_docs(index_name=self.index_name)
+        print(f"found {len(problematic_docs)} problematic_docs")
         for doc in problematic_docs:
             weapons_detected = self._detect_weapons(doc['_source'])
 
@@ -93,10 +94,28 @@ class Analyzer:
                     }
                 }
             )
-
     def delete_non_relevant_rows(self):
         self.logger.debug("delete_non_relevant_rows")
 
+        query = {
+            "query": {
+                "bool": {
+                    "must": [
+                        {"term": {"Antisemitic": False}},
+                        {"terms": {"sentiment": ["neutral", "positive"]}}
+                    ],
+                    "must_not": [
+                        {"exists": {"field": "weapons_detected"}}
+                    ]
+                }
+            }
+        }
+
+        self.es_connector.delete_by_query(
+            index=self.index_name,
+            query=query
+        )
+        self.es_connector.refresh_index(index_name=self.index_name)
     def _insert_documents(self, index_name, documents):
         for doc in documents:
             pass
@@ -127,3 +146,4 @@ class Analyzer:
 
         detected_weapons = [w for w in txt.replace(".", "").replace(",", "").split() if w.lower() in black_list]
         return detected_weapons
+

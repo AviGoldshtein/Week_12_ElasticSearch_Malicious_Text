@@ -1,13 +1,11 @@
 from core.elastic_connector import ElasticConnector
-from nltk.sentiment.vader import SentimentIntensityAnalyzer
 from core.logger import logger
 from core.data_loader import DataLoader
+from nltk.sentiment.vader import SentimentIntensityAnalyzer
 from dateutil import parser
 import pandas as pd
 import os
 import nltk
-import json
-import re
 
 
 nltk_dir = "/tmp/nltk_data"
@@ -62,7 +60,6 @@ class Analyzer:
         normalized_documents = [self._normalize_document(doc) for doc  in documents]
 
         self._insert_documents(index_name, normalized_documents)
-        # print(json.dumps(normalized_documents[:10], indent=4))
     def find_sentiments(self):
         self.logger.debug("find_sentiments")
         all_documents = self.es_connector.get_all_documents(index_name=self.index_name)

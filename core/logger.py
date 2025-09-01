@@ -6,8 +6,3 @@ logging.basicConfig(
 )
 
 logger = logging.getLogger("logger")
-
-# logger.debug("debug")
-# logger.info("info")
-# logger.warning("warning")
-# logger.critical("critical")

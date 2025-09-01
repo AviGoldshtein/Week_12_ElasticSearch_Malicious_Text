@@ -1,21 +1,17 @@
-from fastapi import FastAPI
-from contextlib import asynccontextmanager
-import uvicorn
 from core.manager import Manager
 from core.logger import logger
-import json
+from contextlib import asynccontextmanager
+from fastapi import FastAPI
+import uvicorn
 
 manager = Manager()
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     logger.info("the proses of initialize data started")
-    # print("the proses of initialize data started")
     manager.initialize_data()
     logger.info("the proses of initialize data finished")
-    # print("the proses of initialize data finished")
     yield
-
     print("the Enricher server finished")
 
 app = FastAPI(lifespan=lifespan)
@@ -36,17 +32,3 @@ def get_antisemitic_documents_with_weapons():
 
 if __name__ == "__main__":
     uvicorn.run(app, host="127.0.0.1", port=8000)
-
-
-
-
-
-
-
-
-
-
-# manager = Manager()
-# manager.initialize_data()
-# res = manager.get_all_data()[0]
-# print(json.dumps(res, indent=4))

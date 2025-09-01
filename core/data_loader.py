@@ -1,5 +1,5 @@
-import os
 import pandas as pd
+import os
 
 
 class DataLoader:
@@ -13,7 +13,6 @@ class DataLoader:
         if not self.data:
             self.data = pd.read_csv(self.path)
         return self.data
-
     def get_black_list(self):
         base_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
         path = os.path.join(base_path, "data", "weapons.txt")

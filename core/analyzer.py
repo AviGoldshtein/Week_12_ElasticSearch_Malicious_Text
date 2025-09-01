@@ -8,10 +8,10 @@ import os
 import nltk
 
 
-nltk_dir = "/tmp/nltk_data"
-os.makedirs(nltk_dir, exist_ok=True)
-nltk.data.path.append(nltk_dir)
-nltk.download('vader_lexicon', download_dir=nltk_dir, quiet=True)
+# nltk_dir = "/tmp/nltk_data"
+# os.makedirs(nltk_dir, exist_ok=True)
+# nltk.data.path.append(nltk_dir)
+# nltk.download('vader_lexicon', download_dir=nltk_dir, quiet=True)
 
 
 class Analyzer:

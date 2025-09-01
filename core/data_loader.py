@@ -18,7 +18,4 @@ class DataLoader:
         base_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
         path = os.path.join(base_path, "data", "weapons.txt")
         with open(path, mode="r", encoding="utf-8") as black_list:
-            return black_list.read().lower().split()
-
-d = DataLoader()
-print(d.load_data().head().to_string())
+            return black_list.read().lower().splitlines()

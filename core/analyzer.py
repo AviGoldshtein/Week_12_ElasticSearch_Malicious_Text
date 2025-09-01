@@ -1,6 +1,7 @@
 from core.elastic_connector import ElasticConnector
 from nltk.sentiment.vader import SentimentIntensityAnalyzer
 from core.logger import logger
+from core.data_loader import DataLoader
 from dateutil import parser
 import pandas as pd
 import os
@@ -9,18 +10,17 @@ import json
 import re
 
 
-
 nltk_dir = "/tmp/nltk_data"
 os.makedirs(nltk_dir, exist_ok=True)
 nltk.data.path.append(nltk_dir)
 nltk.download('vader_lexicon', download_dir=nltk_dir, quiet=True)
 
 
-
 class Analyzer:
     def  __init__(self, df: pd.DataFrame, index_name: str):
         self.logger = logger
         self.es_connector = ElasticConnector()
+        self.data_loader = DataLoader()
         self.df = df
         self.index_name = index_name
 
@@ -56,7 +56,6 @@ class Analyzer:
             }
         }
         self.es_connector.create_index(index_name, mappings=mapping)
-
     def insert_data_to_es(self, index_name):
         self.logger.debug("insert_data_to_es")
         documents = self.df.to_dict(orient="records")
@@ -64,7 +63,6 @@ class Analyzer:
 
         self._insert_documents(index_name, normalized_documents)
         # print(json.dumps(normalized_documents[:10], indent=4))
-
     def find_sentiments(self):
         self.logger.debug("find_sentiments")
         all_documents = self.es_connector.get_all_documents(index_name=self.index_name)
@@ -80,14 +78,24 @@ class Analyzer:
                     }
                 }
             )
-
-
     def find_detected_weapons(self):
         self.logger.debug("find_detected_weapons")
+        problematic_docs = self.es_connector.get_problematic_docs(index_name=self.index_name)
+        for doc in problematic_docs:
+            weapons_detected = self._detect_weapons(doc['_source'])
+
+            self.es_connector.update_document(
+                index=doc['_index'],
+                id=doc['_id'],
+                body={
+                    "doc": {
+                        "weapons_detected": weapons_detected
+                    }
+                }
+            )
 
     def delete_non_relevant_rows(self):
         self.logger.debug("delete_non_relevant_rows")
-
 
     def _insert_documents(self, index_name, documents):
         for doc in documents:
@@ -113,4 +121,9 @@ class Analyzer:
             return "neutral"
         else:
             return "positive"
+    def _detect_weapons(self, doc):
+        black_list = self.data_loader.get_black_list()
+        txt = doc['text']
 
+        detected_weapons = [w for w in txt.replace(".", "").replace(",", "").split() if w.lower() in black_list]
+        return detected_weapons

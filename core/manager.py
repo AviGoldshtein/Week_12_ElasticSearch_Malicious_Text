@@ -14,11 +14,11 @@ class Manager:
         self.logger.debug("initialize_data")
         df = self.data_loader.load_data()
         analyzer = Analyzer(df, index_name="malicious")
-        # analyzer.create_index_and_mapping(index_name="malicious")
-        # analyzer.insert_data_to_es(index_name="malicious")
+        analyzer.create_index_and_mapping(index_name="malicious")
+        analyzer.insert_data_to_es(index_name="malicious")
         analyzer.find_sentiments()
-        # analyzer.find_detected_weapons()
-        # analyzer.delete_non_relevant_rows()
+        analyzer.find_detected_weapons()
+        analyzer.delete_non_relevant_rows()
 
     def get_all_data(self):
         return self.es_connector.get_all_documents(index_name="malicious")

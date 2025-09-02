@@ -10,3 +10,5 @@ docker run --name elastic_search --net malicious-net-12 -d -e ELASTIC_HOST=es -e
 
 
 docker compose up -d
+
+docker push avigoldshtein/week_12_elastic_search_malicious_text:latest

@@ -1,0 +1,28 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: elastic-search
+  namespace: avigoldshtein-dev
+spec:
+  selector:
+    matchLabels:
+      app: elastic-search
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: elastic-search
+    spec:
+      containers:
+      - image: avigoldshtein/week_12_elastic_search_malicious_text:latest
+        name: elastic-search
+        imagePullPolicy: Always
+        env:
+          - name: ELASTIC_HOST
+            value: "es"
+          - name: ELASTIC_PORT
+            value: "9200"
+        ports:
+        - containerPort: 8000
+          name: elastic-search
